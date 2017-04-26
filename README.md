@@ -23,7 +23,14 @@
 
 Perry suggested the following test wrapper to run tests in a single file:
 
-```{r}
+```{r}().
+library(nimble)
+library(testthat)
+source(system.file(file.path('tests', 'test_utils.R'), package = 'nimble'))
+if (0) options(error = recover) else options(error = NULL)  # Toggle 0/1 to enable/disable recover().
+
+# This tests the file 'tests/test-optim.R'.
+test_package('nimble', 'optim', reporter = 'tap')  # tap has prettier error reporting.
 ```
 
 ## Source Code Navigation
