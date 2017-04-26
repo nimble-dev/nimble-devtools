@@ -16,6 +16,5 @@ R CMD INSTALL \
   --no-help \
   --no-demo \
   --no-multiarch \
-  --with-keep.source \
   --no-byte-compile \
   nimble_*.tar.gz
