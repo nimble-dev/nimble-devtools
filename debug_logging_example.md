@@ -6,6 +6,15 @@ function name, argument names and values, and return value. We want the
 logger to be minmally invasive so that it is easy to annotate a function
 as debugged.
 
+    ## Logging annotations for internal functions.
+    ## Logging is controlled by the environment variable NIMBLE_LOG.
+    ## For example to log a function `myFun` to the `DEBUG channel`, annotate the function definition with
+    ##   myFun <- 'DEBUG' %logged% function (...) {...}
+    ## and add `DEBUG` to the list of logged channels
+    ##   NIMBLE_LOG=DEBUG  R CMD BATCH myScript.R   # in bash.
+    ## or
+    ##   Sys.setenv(NIMBLE_LOG = 'DEBUG'); ...reload nimble library...  # in R.
+    ## To enable multiple loggingn channels, set `NIMBLE_LOG` to a comma delimited list.
     `%logged%` <- function(prefix, fun) {
         # if (length(grep(prefix, Sys.getenv('NIMBLE_LOG'))) == 0) return(fun)  # Logging is disabled.
         function (...) {
@@ -14,8 +23,11 @@ as debugged.
             cat(prefix, deparse(match.call()), '\n', file = stderr())
             cat(prefix, '>', capture.output(print(list(...))), '\n', file = stderr())
             .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent + 1
-            ret <- fun(...)
-            .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent - 1
+            tryCatch({
+                ret <- fun(...)
+            }, finally = {
+                .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent - 1
+            })
             cat(prefix, '<', capture.output(print(ret)), '\n', file = stderr())
             return(ret)
         }
