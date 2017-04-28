@@ -6,16 +6,17 @@ function name, argument names and values, and return value. We want the
 logger to be minmally invasive so that it is easy to annotate a function
 as debugged.
 
-    .GlobalEnv$.log.indent <- 0
     `%logged%` <- function(prefix, fun) {
+        # if (length(grep(prefix, Sys.getenv('NIMBLE_LOG'))) == 0) return(fun)  # Logging is disabled.
         function (...) {
+            .GlobalEnv$.log.indent <- max(0, .GlobalEnv$.log.indent)
             prefix <- paste0(prefix, paste0(rep('  ', .GlobalEnv$.log.indent), collapse=''))
-            cat(prefix, deparse(match.call()), '\n')
-            cat(prefix, '>', capture.output(print(list(...))), '\n')
+            cat(prefix, deparse(match.call()), '\n', file = stderr())
+            cat(prefix, '>', capture.output(print(list(...))), '\n', file = stderr())
             .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent + 1
             ret <- fun(...)
             .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent - 1
-            cat(prefix, '<', capture.output(print(ret)), '\n')
+            cat(prefix, '<', capture.output(print(ret)), '\n', file = stderr())
             return(ret)
         }
     }
@@ -39,52 +40,6 @@ To debug `fib`, we'll simply add `'DEBUG' %logged%` to its definition
         return(fib(x - 1) + fib(x - 2))
     }
     fib(5)
-
-    ## DEBUG fib(5) 
-    ## DEBUG > [[1]] [1] 5  
-    ## DEBUG   fib(x - 1) 
-    ## DEBUG   > [[1]] [1] 4  
-    ## DEBUG     fib(x - 1) 
-    ## DEBUG     > [[1]] [1] 3  
-    ## DEBUG       fib(x - 1) 
-    ## DEBUG       > [[1]] [1] 2  
-    ## DEBUG         fib(x - 1) 
-    ## DEBUG         > [[1]] [1] 1  
-    ## DEBUG         < [1] 1 
-    ## DEBUG         fib(x - 2) 
-    ## DEBUG         > [[1]] [1] 0  
-    ## DEBUG         < [1] 0 
-    ## DEBUG       < [1] 1 
-    ## DEBUG       fib(x - 2) 
-    ## DEBUG       > [[1]] [1] 1  
-    ## DEBUG       < [1] 1 
-    ## DEBUG     < [1] 2 
-    ## DEBUG     fib(x - 2) 
-    ## DEBUG     > [[1]] [1] 2  
-    ## DEBUG       fib(x - 1) 
-    ## DEBUG       > [[1]] [1] 1  
-    ## DEBUG       < [1] 1 
-    ## DEBUG       fib(x - 2) 
-    ## DEBUG       > [[1]] [1] 0  
-    ## DEBUG       < [1] 0 
-    ## DEBUG     < [1] 1 
-    ## DEBUG   < [1] 3 
-    ## DEBUG   fib(x - 2) 
-    ## DEBUG   > [[1]] [1] 3  
-    ## DEBUG     fib(x - 1) 
-    ## DEBUG     > [[1]] [1] 2  
-    ## DEBUG       fib(x - 1) 
-    ## DEBUG       > [[1]] [1] 1  
-    ## DEBUG       < [1] 1 
-    ## DEBUG       fib(x - 2) 
-    ## DEBUG       > [[1]] [1] 0  
-    ## DEBUG       < [1] 0 
-    ## DEBUG     < [1] 1 
-    ## DEBUG     fib(x - 2) 
-    ## DEBUG     > [[1]] [1] 1  
-    ## DEBUG     < [1] 1 
-    ## DEBUG   < [1] 2 
-    ## DEBUG < [1] 5
 
     ## [1] 5
 

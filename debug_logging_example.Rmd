@@ -9,16 +9,17 @@ Let's define a simple recursive debug logger.
 The logger will print function name, argument names and values, and return value.
 We want the logger to be minmally invasive so that it is easy to annotate a function as debugged.
 ```{r}
-.GlobalEnv$.log.indent <- 0
 `%logged%` <- function(prefix, fun) {
+    # if (length(grep(prefix, Sys.getenv('NIMBLE_LOG'))) == 0) return(fun)  # Logging is disabled.
     function (...) {
+        .GlobalEnv$.log.indent <- max(0, .GlobalEnv$.log.indent)
         prefix <- paste0(prefix, paste0(rep('  ', .GlobalEnv$.log.indent), collapse=''))
-        cat(prefix, deparse(match.call()), '\n')
-        cat(prefix, '>', capture.output(print(list(...))), '\n')
+        cat(prefix, deparse(match.call()), '\n', file = stderr())
+        cat(prefix, '>', capture.output(print(list(...))), '\n', file = stderr())
         .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent + 1
         ret <- fun(...)
         .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent - 1
-        cat(prefix, '<', capture.output(print(ret)), '\n')
+        cat(prefix, '<', capture.output(print(ret)), '\n', file = stderr())
         return(ret)
     }
 }
