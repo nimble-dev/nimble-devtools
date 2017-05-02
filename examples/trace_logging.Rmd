@@ -1,0 +1,115 @@
+---
+title: "Trace logging example"
+output: md_document
+---
+
+**Objective:** Log an selective execution trace to a file, so that traces of two different executions can be diffed.
+
+# Defining a tracing tool
+
+Let's define a simple recursive tracing tool.
+```{r}
+.GlobalEnv$.trace.file = ''
+.GlobalEnv$.trace.filename = NA
+tracer.start <- function(filename = '/tmp/trace.txt') {
+    .GlobalEnv$.trace.filename <- filename
+    .GlobalEnv$.trace.file <- file(filename, open = 'w+')
+}
+tracer.stop <- function() {
+    close(.GlobalEnv$.trace.file, type = 'w+')
+    .GlobalEnv$.trace.file <- file(.GlobalEnv$.trace.filename, open = 'r')
+    lines <- readLines(.GlobalEnv$.trace.file)
+    close(.GlobalEnv$.trace.file, type = 'r')
+    .GlobalEnv$.trace.file = ''
+    return(lines)
+}
+tracer.enter <- function() {
+    call <- deparse(sys.call(sys.parent(1)))
+    if (length(call) > 1) {
+        call <- paste(call[[1L]], "....")
+    }
+    cat(paste(rep(' ', .GlobalEnv$.log.indent)), call, "\n", file = .GlobalEnv$.trace.file)
+    .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent + 1
+}
+tracer.exit <- function() {
+    .GlobalEnv$.log.indent <- .GlobalEnv$.log.indent - 1
+}
+tracer.trace <- function(...) {
+    .GlobalEnv$.log.indent <- max(0, .GlobalEnv$.log.indent)
+    untrace(...)
+    trace(..., tracer.enter, tracer.exit, print = FALSE)
+}
+```
+
+To use our debugger, we need only prepend `'DEBUG' %logged%` to each function we want to debug. Suppose we start with a function
+```{r}
+fib <- function (x) {
+    if (x == 0 || x == 1) return(x)
+    return(fib(x - 1) + fib(x - 2))
+}
+fib(5)
+```
+To debug `fib`, we'll simply add `'DEBUG' %logged%` to its definition (typically deep in some .R file)
+```{r}
+tracer.trace(fib)
+fib(5)
+```
+Next let's write `fib`'s trace to file.
+```{r}
+tracer.start('/tmp/trace.fib.txt')
+tracer.trace(fib)
+fib(5)
+lines <- tracer.stop()
+```
+Now we can print the trace
+```{r}
+cat(lines, sep = '\n')
+```
+
+# Tracing the NIMBLE compilation of two different functions.
+
+**Objective:** I'm hunting down a bug in an initial prototype of `optim()` in NIMBLE.
+
+In this section we'll diff two different `compileNimble` invocations: a successful run using `eigen` and a failing run using `optim`.
+```{r}
+library(nimble)
+testCompilation <- function(type) {
+    # Setup a nimbleFunction to compile.
+    if (type == 'optim') {
+        run <- function(par = double(1)) {
+            return(fakeOptim(par))
+            returnType(optimResultNimbleList())
+        }
+    } else if (type == 'eigen') {
+        run <- function(par = double(2)) {
+            return(eigen(par))
+            returnType(eigenNimbleList())
+        }
+    } else {
+        stop(paste('Unknown type:', type))
+    }
+    nimFun <- nimbleFunction(setup = TRUE, run = run)()
+    filename <- paste0('/tmp/trace.', type, '.txt')
+
+    # Configure which internal NIMBLE functions to trace.
+    # TODO add more functions to trace here, so that the two traces differ.
+    tracer.trace(compileNimble)
+    # tracer.trace(nimble:::nimbleProjectClass)  # FIXME this does not work.
+
+    # Run the function, dumping trace to file.
+    tracer.start(filename)
+    try(compileNimble(nimFun, showCompilerOutput = TRUE, dirName = '~/tmp'))
+    tracer.stop()
+    return(filename)
+}
+```
+Now we'll run both versions.
+```{r}
+eigenFile <- testCompilation('eigen')
+optimFile <- testCompilation('optim')
+```
+Finally, we'll open the two traces in an external diff tool, say [meld](http://meldmerge.org/).
+```{r}
+system2('meld', c(eigenFile, optimFile), wait = FALSE)
+```
+
