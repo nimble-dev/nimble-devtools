@@ -25,7 +25,7 @@ These steps attempt to speed up `R CMD build nimble && R CMD INSTALL nimble_*.ta
 
 Perry suggested the following test wrapper to run tests in a single file:
 
-```{r}().
+```{r}
 library(nimble)
 library(testthat)
 source(system.file(file.path('tests', 'test_utils.R'), package = 'nimble'))
@@ -34,6 +34,31 @@ if (0) options(error = recover) else options(error = NULL)  # Toggle 0/1 to enab
 # This tests the file 'tests/test-optim.R'.
 test_package('nimble', 'optim', reporter = 'tap')  # tap has prettier error reporting.
 ```
+
+## Quickly open the latest NIMBLE-generated C++ files
+
+To quickly open the latest generated C++ files
+
+1.  Install [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
+    so that the files can be automatically formatted. For example
+
+    ```{bash}
+    brew install clang-format          # OS X
+    sudo apt-get install clang-format  # linux
+    ```
+
+2.  Set your `EDITOR` environment variable to your favorite editor
+    (`vim`, `emacs`, `sublime`, etc.)
+
+3.  Configure nimble to compile to the directory `~/tmp`
+
+    ```{r}
+    compileNimble(myFunction, dirName = '~/tmp')
+    ```
+
+4.  Run [nim-show.py](nim-show.py).
+    I've added this to my `PATH` so I can type `nim-sh<TAB><ENTER>`
+    anywhere to quickly see the latest 
 
 ## Navigate Source Code
 
