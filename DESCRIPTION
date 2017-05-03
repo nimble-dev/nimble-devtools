@@ -1,0 +1,12 @@
+Package: nimble.devtools
+Title: NIMBLE developer tools
+Version: 0.0.0
+Author: Fritz Obermeyer <fritz.obermeyer@gmail.com>
+Description: Provides functions for development on NIMBLE, including RStudio addins.
+Depends:
+    R (>= 3.1.2)
+Imports:
+    rstudioapi (>= 0.4)
+License: BSD_3_clause + file LICENSE
+LazyData: false
+RoxygenNote: 5.0.1

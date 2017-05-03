@@ -1,0 +1,4 @@
+Name: Hot Reload Code
+Description: Reloads code into package:nimble.
+Binding: hotReloadAddin
+Interactive: false
