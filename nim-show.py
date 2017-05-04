@@ -13,4 +13,9 @@ file_h = max(glob.glob('{}/P_*.h'.format(TEMPDIR)), key=mtime)
 file_cpp = max(glob.glob('{}/P_*.cpp'.format(TEMPDIR)), key=mtime)
 
 os.system('clang-format -i {} {}'.format(file_h, file_cpp))
-os.system('{} -o {} {}'.format(EDITOR, file_h, file_cpp))
+
+if EDITOR in ['vim', 'gvim', 'mvim']:
+    editor = '{} -o'.format(EDITOR)  # Open all files in one window.
+else:
+    editor = EDITOR
+os.system('{} {} {}'.format(editor, file_h, file_cpp))
