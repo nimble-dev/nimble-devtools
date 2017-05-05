@@ -2,3 +2,8 @@ Name: Hot Reload Code
 Description: Reloads code into package:nimble.
 Binding: hotReloadAddin
 Interactive: false
+
+Name: Open Generated C++ Files
+Description: Opens the latest generated C++ files in tempdir().
+Binding: openGeneratedSources
+Interactive: false

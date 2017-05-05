@@ -1,33 +1,41 @@
 # Developer tools for the [NIMBLE](http://r-nimble.org) project
 
-## Reload NIMBLE code in RStudio without reinstalling NIMBLE
+First install this package:
+```{r}
+devtools::install_github('nimble-dev/nimble-devtools')
+```
+Next restart RStudio and verify that you see menu items
+`Tools > Addins > Hot Reload Code` and
+`Tools > Addins > Open Genrated C++ Files`.
+
+To use RStudio addins, you may need to upgrade to a more recent RStudio.
+
+## RStudio Addin: Reload NIMBLE code without reinstalling NIMBLE
 
 If you modify an internal NIMBLE function in-place and want to reload it quickly
 (without a lengthy R CMD INSTALL process), you can use our Hot Reload addin for
 RStudio.
-Note that you may need to update to a more recent RStudio version.
 
-1.  Install the `nimble.devtools` R package (from this repo)
-
-    ```{sh}
-    git clone git@github.com:nimble-dev/nimble-devtools  # this repo
-    cd nimble-devtools
-    R CMD INSTALL .
-    ```
-
-2.  Restart RStudio and verify you see a menu item
-    `Tools > Addins > Hot Reload Code`.
-
-3.  (optional) Set a keyboard shortcut for the hot reload addin using
+1.  (optional) Set a keyboard shortcut for the hot reload addin using
     `Tools > Addins > Browse Addins...`. For example I use `CTRL-R`.
 
-4.  In an RStudio editor window, select the entire definition
+2.  In an RStudio editor window, select the entire definition
     `name <- function(...){...}` of your modified NIMBLE code. If your code is
     huge, it helps to fold it using those little triangles on the left hand
     gutter; then you need only select one line of folded code.
 
-5.  Either click on the `Tools > Addins > Hot Reload Code` menu item, or use
+3.  Either click on the `Tools > Addins > Hot Reload Code` menu item, or use
     your new keyboard shortcut.
+
+## RStudio Addin: Open the latest generated C++ files in `tempdir()`
+
+1.  (optional) Set a keyboard shortcut for the hot reload addin using
+    `Tools > Addins > Browse Addins...`. For example I use `CTRL-G`.
+
+2. Generate some C++ files with `compileNimble()`
+
+3.  Either click on the `Tools > Addins > Open Generated C++ Files` menu item,
+    or use your new keyboard shortcut.
 
 ## Speed up package installation
 
