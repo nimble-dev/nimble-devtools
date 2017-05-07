@@ -3,6 +3,32 @@
 # http://stackoverflow.com/questions/23279904
 # http://stackoverflow.com/questions/26381474
 
+is.parsable <- function(text) {
+    return(!inherits(try(parse(text = text), silent = TRUE), 'try-error'))
+}
+
+getEditorText <- function() {
+    range <- rstudioapi::primary_selection(rstudioapi::getSourceEditorContext())$range
+    rstudioapi::setSelectionRanges(c(range$start[['row']], 1, Inf, 1))
+    text <- rstudioapi::primary_selection(rstudioapi::getSourceEditorContext())$text
+    rstudioapi::setSelectionRanges(range)
+    lines <- strsplit(text, '\n')[[1]]
+    for (n in 1:length(lines)) {
+        if (is.parsable(lines[1:n])) {
+            return(paste(lines, collapse = '\n'))
+        }
+    }
+    stop('Failed to parse selection')
+}
+
+assignEvenIfLocked <- function(name, value, envir) {
+    if (bindingIsLocked(name, envir)) {
+        unlockBinding(name, envir)
+        on.exit(lockBinding(name, envir))
+    }
+    assign(name, value, envir = envir, inherits = FALSE)
+}
+
 #' Hot reload selected code into package:nimble.
 #'
 #' To use this, first select a definition like `name <- function(...){...}` in
@@ -15,8 +41,8 @@ hotReloadAddin <- function() {
     pkg <- as.environment('package:nimble')
     
     # Grab selected text of the form 'name <- ...' from an RStudio editor window.
-    selection <- rstudioapi::getSourceEditorContext()$selection
-    expr <- parse(text = paste0(selection[[1]]$text, collapse = '\n'))
+    text <- getEditorText()
+    expr <- parse(text = text)
     if(deparse(expr[[1]][[1]]) != '<-' || !is.name(expr[[1]][[2]])) {
         stop(paste('Expected an assignment like "name <- ...", but got:',
                    deparse(expr[[1]]), sep = '\n'))
@@ -33,7 +59,7 @@ hotReloadAddin <- function() {
     # Update the package:nimble environment if name is exported.
     exported <- exists(name, envir = pkg, inherits = FALSE)
     if(exported) {
-        assign(name, value, envir = pkg)
+        assignEvenIfLocked(name, value, envir = pkg)
         cat('Reloaded nimble::', name, sep = '')
     } else {
         cat('Reloaded nimble:::', name, sep = '')

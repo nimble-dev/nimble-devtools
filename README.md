@@ -19,10 +19,8 @@ RStudio.
 1.  (optional) Set a keyboard shortcut for the hot reload addin using
     `Tools > Addins > Browse Addins...`. For example I use `CTRL-R`.
 
-2.  In an RStudio editor window, select the entire definition
-    `name <- function(...){...}` of your modified NIMBLE code. If your code is
-    huge, it helps to fold it using those little triangles on the left hand
-    gutter; then you need only select one line of folded code.
+2.  In an RStudio editor window, position the cursor on the first line of the
+    definition `name <- function(...){...}` of your modified NIMBLE code.
 
 3.  Either click on the `Tools > Addins > Hot Reload Code` menu item, or use
     your new keyboard shortcut.

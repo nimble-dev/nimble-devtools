@@ -7,3 +7,8 @@ Name: Open Generated C++ Files
 Description: Opens the latest generated C++ files in tempdir().
 Binding: openGeneratedSources
 Interactive: false
+
+Name: Run .GlobalEnv%.test
+Description: Runst the function .GlobalEnv$.test
+Binding: runTestFunction
+Interactive: false

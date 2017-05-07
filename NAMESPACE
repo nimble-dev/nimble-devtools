@@ -1,3 +1,4 @@
 export(hotReloadAddin)
 export(openGeneratedSources)
+export(runTestFunction)
 import(rstudioapi)
