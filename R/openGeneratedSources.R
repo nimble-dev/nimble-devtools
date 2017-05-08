@@ -9,6 +9,7 @@ openGeneratedSources <- function() {
     paths <- rownames(files)
     paths_h <- paths[grep('\\bP_\\w+\\.h$', paths)]
     paths_cpp <- paths[grep('\\bP_\\w+\\.cpp$', paths)]
+    system2('clang-format', list('-i', paths_h[1], paths_cpp[1]))
     rstudioapi::navigateToFile(paths_h[1])
     rstudioapi::navigateToFile(paths_cpp[1])
 }
