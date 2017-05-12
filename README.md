@@ -14,7 +14,7 @@ To use RStudio addins, you may need to upgrade to a more recent RStudio.
 
 If you modify an internal NIMBLE function in-place and want to reload it quickly
 (without a lengthy R CMD INSTALL process), you can use our Hot Reload addin for
-RStudio.
+RStudio. (This is just a smart wrapper around `assignInNamespace`.)
 
 1.  (optional) Set a keyboard shortcut for the hot reload addin using
     `Tools > Addins > Browse Addins...`. For example I use `CTRL-R`.
@@ -27,7 +27,7 @@ RStudio.
 
 ## RStudio Addin: Open the latest generated C++ files in `tempdir()`
 
-1.  (optional) Set a keyboard shortcut for the hot reload addin using
+1.  (optional) Set a keyboard shortcut for the Open Generated C++ addin using
     `Tools > Addins > Browse Addins...`. For example I use `CTRL-G`.
 
 2. Generate some C++ files with `compileNimble()`
