@@ -9,6 +9,16 @@ Binding: openGeneratedSources
 Interactive: false
 
 Name: Run .GlobalEnv%.test
-Description: Runst the function .GlobalEnv$.test
+Description: Runs the function .GlobalEnv$.test
 Binding: runTestFunction
+Interactive: false
+
+Name: options(error = recover)
+Description: options(error = recover)
+Binding: optionsErrorRecover
+Interactive: false
+
+Name: options(error = NULL)
+Description: options(error = NULL)
+Binding: optionsErrorNull
 Interactive: false
